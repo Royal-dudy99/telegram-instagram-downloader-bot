@@ -1,0 +1,22 @@
+#!/bin/bash
+# Pre-commit hook to detect secrets
+
+# Check for potential Telegram bot tokens
+if git diff --cached --name-only | xargs grep -l "[0-9]\{8,10\}:[A-Za-z0-9_-]\{35\}" 2>/dev/null; then
+    echo "❌ SECURITY ALERT: Potential Telegram bot token detected!"
+    echo "Please remove hardcoded tokens and use environment variables instead."
+    echo "Files containing potential tokens:"
+    git diff --cached --name-only | xargs grep -l "[0-9]\{8,10\}:[A-Za-z0-9_-]\{35\}" 2>/dev/null
+    exit 1
+fi
+
+# Check for other common secret patterns
+if git diff --cached --name-only | xargs grep -l -E "(api_key|API_KEY|secret|SECRET|password|PASSWORD|token|TOKEN).*=.*['\"][^'\"]{10,}" 2>/dev/null; then
+    echo "⚠️  WARNING: Potential hardcoded secrets detected!"
+    echo "Please review these files for hardcoded credentials:"
+    git diff --cached --name-only | xargs grep -l -E "(api_key|API_KEY|secret|SECRET|password|PASSWORD|token|TOKEN).*=.*['\"][^'\"]{10,}" 2>/dev/null
+    echo "Consider using environment variables for sensitive data."
+fi
+
+echo "✅ Pre-commit security check passed"
+exit 0

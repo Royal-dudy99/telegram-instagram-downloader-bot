@@ -5,7 +5,11 @@ from telegram import Update
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
 from io import BytesIO
 
-BOT_TOKEN = "***REMOVED***"  # Replace with your actual token
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+
+if not BOT_TOKEN:
+    raise ValueError("BOT_TOKEN environment variable is not set!")
+
 
 class InstagramDownloader:
     def __init__(self):
